@@ -17,7 +17,7 @@ class _PriceScreenState extends State<PriceScreen> {
     setState(() {});
   }
 
-  String selectedAndroidButton = 'USD';
+  String selectedCurrency = 'USD';
 
   DropdownButton<String> getAndroidButton() {
     List<DropdownMenuItem<String>> dropDownItems = [];
@@ -31,12 +31,12 @@ class _PriceScreenState extends State<PriceScreen> {
       print(currency);
     }
     return DropdownButton(
-      value: selectedAndroidButton,
+      value: selectedCurrency,
       items: dropDownItems,
 // newValue is the state variable
       onChanged: (newValue) {
         setState(() {
-          selectedAndroidButton = newValue;
+          selectedCurrency = newValue;
         });
       },
     );
@@ -53,16 +53,12 @@ class _PriceScreenState extends State<PriceScreen> {
       dropDownItems.add(item);
     }
     return CupertinoPicker(
-      //scrollController: FixedExtentScrollController(initialItem: 5),
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        // Get the value for the dropdownItems based on the selectedIndex number and save it in getDropDownItemsText
-        getDropDownItemsText = dropDownItems[selectedIndex];
-
         setState(() {
-          // Convert getDropDownItemsText from Text type to String types.
-          selectedIOSPicker = getDropDownItemsText.data;
+          selectedCurrency = currenciesList[selectedIndex];
+          getAndroidRates();
         });
       },
       children: dropDownItems,
@@ -73,19 +69,14 @@ class _PriceScreenState extends State<PriceScreen> {
   var priceBTC;
 
   Future<String> getAndroidRates() async {
-    priceBTC = await coinData.getResult(selectedAndroidButton);
-    return priceBTC;
-  }
-
-  Future<String> getIOSRates() async {
-    priceBTC = await coinData.getResult(selectedIOSPicker);
+    priceBTC = await coinData.getResult(selectedCurrency);
     return priceBTC;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: Platform.isIOS ? getIOSRates() : getAndroidRates(),
+      future: getAndroidRates(),
       builder: (context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
@@ -107,7 +98,7 @@ class _PriceScreenState extends State<PriceScreen> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                       child: Text(
-                        '1 BTC =  $priceBTC ${Platform.isIOS ? selectedIOSPicker : selectedAndroidButton}',
+                        '1 BTC =  $priceBTC $selectedCurrency',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 20.0,
@@ -128,7 +119,7 @@ class _PriceScreenState extends State<PriceScreen> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                       child: Text(
-                        '1 ETH =  $priceBTC ${Platform.isIOS ? selectedIOSPicker : selectedAndroidButton}',
+                        '1 ETH =  $priceBTC $selectedCurrency',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 20.0,
@@ -149,7 +140,7 @@ class _PriceScreenState extends State<PriceScreen> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                       child: Text(
-                        '1 LTC =  $priceBTC ${Platform.isIOS ? selectedIOSPicker : selectedAndroidButton}',
+                        '1 LTC =  $priceBTC $selectedCurrency',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 20.0,
